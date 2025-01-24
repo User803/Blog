@@ -1,0 +1,17 @@
+services:
+  # PostgreSQL DB
+  db:
+    # Using latest PostgreSQL image
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: password
+
+  # Database management interface
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - 8080:8080
