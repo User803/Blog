@@ -1,13 +1,16 @@
 package com.app.blog.controllers;
 
 import com.app.blog.domain.CreatePostRequest;
+import com.app.blog.domain.UpdatePostRequest;
 import com.app.blog.domain.dtos.CreatePostRequestDto;
 import com.app.blog.domain.dtos.PostDto;
+import com.app.blog.domain.dtos.UpdatePostRequestDto;
 import com.app.blog.domain.entities.Post;
 import com.app.blog.domain.entities.User;
 import com.app.blog.mappers.PostMapper;
 import com.app.blog.services.PostService;
 import com.app.blog.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +52,7 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostDto> createPost(
-            @RequestBody CreatePostRequestDto createPostRequestDto,
+            @Valid @RequestBody CreatePostRequestDto createPostRequestDto,
             @RequestAttribute UUID userId) {
 
         User loggedInUser = userService.getUserById(userId);
@@ -58,6 +61,26 @@ public class PostController {
         PostDto createdPostDto = postMapper.toDto(createdPost);
 
         return new ResponseEntity<>(createdPostDto, HttpStatus.CREATED);
+    }
+
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<PostDto> updatePost(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdatePostRequestDto updatePostRequestDto) {
+
+        UpdatePostRequest updatePostRequest = postMapper.toUpdatePostRequestDto(updatePostRequestDto);
+        Post updatedPost = postService.updatePost(id, updatePostRequest);
+        PostDto updatedPostDto = postMapper.toDto(updatedPost);
+
+        return ResponseEntity.ok(updatedPostDto);
+    }
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<PostDto> getPost(@PathVariable UUID id){
+        Post post = postService.getPost(id);
+        PostDto postDto = postMapper.toDto(post);
+
+        return ResponseEntity.ok(postDto);
     }
 
 
